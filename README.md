@@ -54,4 +54,4 @@ Método onde apenas **um a cada quatro pixels** (em uma janela 2×2) é selecion
 
 - #### *Média de Blocos (Block Averaging)*
 
-Cada bloco de **2×2 pixels** na imagem original é combinado em um **único pixel** na imagem reduzida, onde o valor do novo pixel é a **média aritmética** dos quatro pixels originais. Este método preserva melhor as características da imagem original reduzindo o aliasing.
+Cada bloco de **2×2 pixels** na imagem original é combinado em um **único pixel** na imagem reduzida, onde o valor do novo pixel é a **média aritmética** dos quatro pixels originais.

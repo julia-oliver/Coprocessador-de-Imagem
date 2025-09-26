@@ -127,6 +127,13 @@ O desenvolvimento se iniciou com a implementação dos algoritmos em Python. Est
 
 Após a conversão das lógicas para os módulos em Verilog, a fase de simulação foi conduzida utilizando o Icarus Verilog. Nesta etapa, foram realizados testes focados em verificar o comportamento funcional de cada módulo, garantindo que a matemática de endereçamento (rom_addr, ram_addr) e a lógica de controle estivessem corretas. 
 
+
+![Exemplo de Icarus Verilog](imagens/exemploicarus.png)
+Exemplo de teste no Icarus Verilog.
+
 A estratégia de teste final concentrou-se na validação direta em hardware. O código foi sintetizado e carregado na placa FPGA, e o foco passou para testes brutos, refatorando o código e observando a saída. O debugging foi feito diretamente ao testar na placa e no VGA. O sucesso foi determinado pelo funcionamento correto dos algoritmos na placa — verificando-se visualmente se a imagem estava sendo ampliada ou reduzida conforme o esperado, se o chaveamento entre os algoritmos (SW) era funcional e se o timing do vga_driver estava sincronizado, validando assim a interação completa do sistema.
+
+![Exemplo de Monitor](imagens/exemplomonitor.jpeg)
+Exemplo de teste na FPGA.
 
 ## Análise dos Resultados

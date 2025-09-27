@@ -12,8 +12,6 @@
 * [Descrição da Solução](#descrição-da-solução)
     * [Arquitetura do Co-processador](#arquitetura-do-co-processador)
     * [Fluxo de Dados](#fluxo-de-dados)
-    * [A Unidade de Controle (UC)](#a-unidade-de-controle-uc)
-    * [Gerenciamento de Memórias e Exibição](#gerenciamento-de-memórias-e-exibição)
     * [Implementação dos Algoritmos](#implementação-dos-algoritmos)
 * [Modo de Uso: Utilizando o Coprocessador](#modo-de-uso-utilizando-o-coprocessador)
 * [Explicação dos Testes](#explicação-dos-testes)
@@ -143,7 +141,7 @@ Quando o sistema não está em uma operação de redimensionamento (!operacao_at
 
 A combinação desses estados e o controle sobre os sinais de multiplexação garantem que cada etapa do fluxo de dados — desde a leitura da imagem original até a exibição da imagem redimensionada — ocorra sem interrupções e de maneira coordenada.
 
-![Exemplo de Fluxo de Dados](imagens/exemploicarus.png)
+![Exemplo de Fluxo de Dados](imagens/ExemploFluxodeDados.jpeg)
 
 Exemplo do fluxo de dados na unidade de controle.
 

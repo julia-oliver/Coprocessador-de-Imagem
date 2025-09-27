@@ -137,15 +137,16 @@ A Unidade de Controle também é responsável por gerenciar os acessos à memór
  
 A UC controla um multiplexador que seleciona qual endereço é enviado à RAM. Durante o estado de processamento, ela prioriza o endereço do módulo de processamento. Após a conclusão (done ser detectado), ela ativa a flag exibe_imagem, que muda a seleção do multiplexador para o endereço calculado pelo driver de vídeo, permitindo que a imagem redimensionada seja exibida na tela.
 
+![Exemplo de Fluxo de Dados](imagens/ExemploFluxodeDados.jpeg)
+
+Exemplo do fluxo de dados na unidade de controle.
+
 **Modo de Repouso:** 
 
 Quando o sistema não está em uma operação de redimensionamento (!operacao_ativa) e a flag de exibição (exibe_imagem) está desativada, a UC entra em um estado de repouso. Nesse estado, ela configura o sistema para exibir a imagem original, lendo-a diretamente da MemoriaROM e enviando-a para o driver VGA. Isso cria uma experiência de usuário fluida, onde a imagem original é sempre exibida até que uma nova operação de redimensionamento seja solicitada.
 
 A combinação desses estados e o controle sobre os sinais de multiplexação garantem que cada etapa do fluxo de dados — desde a leitura da imagem original até a exibição da imagem redimensionada — ocorra sem interrupções e de maneira coordenada.
 
-![Exemplo de Fluxo de Dados](imagens/ExemploFluxodeDados.jpeg)
-
-Exemplo do fluxo de dados na unidade de controle.
 
 ### Implementação dos Algoritmos:
 

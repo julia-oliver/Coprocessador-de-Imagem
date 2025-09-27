@@ -118,13 +118,14 @@ Os algoritmos de redimensionamento controlam o acesso às memórias. A ROM forne
 - *Durante a Exibição:*
 O driver VGA assume o controle da RAM para leitura, calculando os endereços baseados na posição do pixel sendo renderizado. A escrita na RAM é desabilitada para preservar a integridade dos dados armazenados.
 
+![Exemplo da Multiplexação da Memória](imagens/ExemploFluxodeDados.jpeg)
+
+Exemplo da multiplexação da memória.
+
 ### Controle de Transição
 
 A transição entre os modos é controlada por uma máquina de estados que detecta quando o processamento é concluído e automaticamente habilita o modo de exibição. Isso garante que a imagem só seja mostrada após estar completamente processada, evitando artefatos visuais durante a operação.
 
-![Exemplo da Multiplexação da Memória](imagens/ExemploFluxodeDados.jpeg)
-
-Exemplo da multiplexação da memória.
 
 ### Implementação dos Algoritmos:
 

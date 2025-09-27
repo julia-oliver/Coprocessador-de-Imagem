@@ -1,5 +1,24 @@
 # Coprocessador-de-Imagem
 
+## Sumário
+
+* [Introdução e Definição do Problema](#introdução-e-definição-do-problema)
+* [Requisitos Principais](#requisitos-principais)
+    * [Aproximação (Zoom in)](#aproximação-zoom-in)
+    * [Redução (Zoom out)](#redução-zoom-out)
+* [Fundamentação Teórica](#fundamentação-teórica)
+    * [Representação Digital da Imagem](#representação-digital-da-imagem)
+    * [Algoritmos de Redimensionamento](#algoritmos-de-redimensionamento)
+* [Descrição da Solução](#descrição-da-solução)
+    * [Arquitetura do Co-processador](#arquitetura-do-co-processador)
+    * [Fluxo de Dados](#fluxo-de-dados)
+    * [A Unidade de Controle (UC)](#a-unidade-de-controle-uc)
+    * [Gerenciamento de Memórias e Exibição](#gerenciamento-de-memórias-e-exibição)
+    * [Implementação dos Algoritmos](#implementação-dos-algoritmos)
+* [Modo de Uso: Utilizando o Coprocessador](#modo-de-uso-utilizando-o-coprocessador)
+* [Explicação dos Testes](#explicação-dos-testes)
+* [Conclusão](#conclusão)
+
 ## Introdução e Definição do Problema
 
 Este projeto aborda o desenvolvimento de um módulo embarcado de **Redimensionamento de Imagens** focado em sistemas de vigilância e exibição em tempo real, sob o tema "Zoom Digital: Redimensionamento de Imagens com FPGA em Verilog".
@@ -73,11 +92,56 @@ A arquitetura do sistema é dividida em cinco componentes principais interligado
 
 ### Fluxo de Dados
 
-O processo começa com a Unidade de Controle (UC) no estado INICIO, aguardando o sinal de partida. Assim que o start é acionado, a UC verifica o seletor SW para identificar qual algoritmo será utilizado – como Decimação ou Replicação. Imediatamente, um multiplexador de controle entra em ação, gerando um pulso start_pulse direcionado exclusivamente ao módulo de processamento selecionado. Dessa forma, garante-se que apenas esse módulo assuma o controle dos barramentos. Em seguida, a UC avança para o estado EXECUTE.
+O processo tem início quando a Unidade de Controle (UC), em estado de INÍCIO, detecta o sinal de start. A UC lê o seletor SW para determinar o algoritmo a ser executado (Decimação, Replicação, etc.). Um multiplexador de controle direciona um pulso de start_pulse apenas para o módulo de processamento selecionado. Esse módulo, por sua vez, assume o controle dos barramentos de memória e a UC avança para o estado de EXECUÇÃO.
 
-No estado EXECUTE, tem início um ciclo contínuo de leitura, processamento e escrita. O módulo ativo calcula o endereço rom_addr e o envia para a MemoriaROM, que retorna o pixel original pixel_in. Após a transformação pelo algoritmo, o módulo gera o pixel resultante pixel_out. Para a escrita, ele calcula o endereço de destino ram_addr e assume o controle da MemoriaImgRED – uma RAM de porta única – ativando o sinal wren. O pixel_out é então gravado em ram_addr. Vale destacar que, enquanto a UC permanece em EXECUTE, a porta da RAM é dedicada integralmente à escrita dos resultados, suspendendo temporariamente a leitura para exibição VGA. Esse ciclo se repete em alta velocidade até que a imagem redimensionada esteja completamente armazenada na RAM.
+No estado de EXECUÇÃO, o módulo ativo inicia um ciclo contínuo de leitura, processamento e escrita:
 
-Ao concluir a escrita, o módulo de processamento sinaliza done. A UC, ao detectar esse sinal, interrompe a operação (zerando wren) e ativa a flag exibe_imagem. Esse acionamento libera a porta única da RAM para leitura. Com exibe_imagem em nível alto, um multiplexador de dados na saída de vídeo passa a selecionar o pixel da MemoriaImgRED (Imagem Redimensionada) como fonte para out_vga. Por fim, o vga_driver recebe esse sinal e gera os sincronismos hsync e vsync, além dos sinais de cor RGB para exibição no monitor
+- **Leitura:** O módulo calcula o endereço (rom_addr) e solicita o pixel da MemoriaROM, que contém a imagem original.
+
+- **Processamento:** O pixel é transformado de acordo com o algoritmo selecionado.
+
+- **Escrita:** O módulo calcula o endereço de destino (ram_addr) na MemoriaImgRED (uma RAM de porta única) e ativa o sinal de escrita (wren). O pixel resultante é então gravado.
+
+Este ciclo se repete em alta velocidade até que toda a imagem redimensionada esteja completa na RAM. Durante este período, a porta da RAM é dedicada exclusivamente à escrita, suspendendo temporariamente a leitura para exibição VGA.
+
+Ao final do processo, o módulo de processamento envia o sinal done para a UC. A UC, ao detectar esse sinal, desativa a escrita (wren) e ativa a flag exibe_imagem. Essa flag libera a porta da RAM para leitura e um multiplexador de dados direciona a imagem redimensionada para o driver VGA, que a exibe no monitor.
+
+
+**A Unidade de Controle (UC)**
+
+A Unidade de Controle é o cérebro do sistema, orquestrando a sequência de operações para redimensionar a imagem. Implementada como uma Máquina de Estados Finita (FSM), ela gerencia o fluxo de dados e garante que cada módulo (Decimação, Replicação, etc.) execute sua tarefa no momento correto, evitando conflitos de acesso às memórias.
+
+O ciclo de vida da UC é dividido em três estados principais, que se repetem enquanto o sistema está em operação:
+
+- **Estado INICIO:** Este é o estado de repouso da UC. Nela, o sistema aguarda pacientemente por um comando de início. A transição para o próximo estado acontece quando o sinal start_pulse é detectado e nenhuma operação está ativa (!operacao_ativa). O start_pulse é gerado por um circuito de detecção de borda no botão de start, garantindo que o comando seja acionado apenas uma vez por pressão. Ao sair deste estado, a UC armazena a seleção do algoritmo (SW) para uso futuro.
+
+- **Estado EXECUTE:** Após o sinal de start, a UC transita para este estado. Sua função aqui é passar o controle para o módulo de processamento selecionado. Neste momento, um multiplexador direciona o start_pulse apenas para o módulo correspondente, que então inicia o ciclo de leitura, processamento e escrita. A UC permanece neste estado por apenas um ciclo de clock, agindo como um "gerente" que delega a tarefa e, em seguida, move-se para o próximo estado para aguardar o resultado.
+
+- **Estado CHECK:** Neste estado, a UC fica em um laço de espera. Ela monitora o sinal done do módulo de processamento que foi ativado. O sinal done indica que o módulo terminou de redimensionar a imagem e gravou todos os pixels na MemoriaImgRED. Assim que o done é detectado, a UC executa ações cruciais:
+
+  - Desativa a operação (operacao_ativa <= 1'b0), o que impede novas execuções até um novo comando de start.
+
+  - Ativa a flag ready, informando que o processo de redimensionamento está completo e o sistema está pronto para exibir o resultado.
+
+  - Define o próximo estado como INICIO, preparando o sistema para um novo ciclo.
+
+**Gerenciamento de Memórias e Exibição**
+
+A Unidade de Controle também é responsável por gerenciar os acessos à memória e o que é exibido na tela.
+
+*Multiplexação de Endereços:* O sistema tem duas fontes de endereços para a memória RAM (MemoriaImgRED):
+
+- O módulo de processamento, que calcula o endereço de destino para a escrita (ram_addr_writer).
+
+- O driver de vídeo VGA, que calcula o endereço para a leitura e exibição (ram_addr_calc).
+ 
+A UC controla um multiplexador que seleciona qual endereço é enviado à RAM. Durante o estado de processamento, ela prioriza o endereço do módulo de processamento. Após a conclusão (done ser detectado), ela ativa a flag exibe_imagem, que muda a seleção do multiplexador para o endereço calculado pelo driver de vídeo, permitindo que a imagem redimensionada seja exibida na tela.
+
+**Modo de Repouso:** 
+
+Quando o sistema não está em uma operação de redimensionamento (!operacao_ativa) e a flag de exibição (exibe_imagem) está desativada, a UC entra em um estado de repouso. Nesse estado, ela configura o sistema para exibir a imagem original, lendo-a diretamente da MemoriaROM e enviando-a para o driver VGA. Isso cria uma experiência de usuário fluida, onde a imagem original é sempre exibida até que uma nova operação de redimensionamento seja solicitada.
+
+A combinação desses estados e o controle sobre os sinais de multiplexação garantem que cada etapa do fluxo de dados — desde a leitura da imagem original até a exibição da imagem redimensionada — ocorra sem interrupções e de maneira coordenada.
 
 ### Implementação dos Algoritmos:
 
@@ -136,4 +200,10 @@ A estratégia de teste final concentrou-se na validação direta em hardware. O 
 ![Exemplo de Monitor](imagens/exemplomonitor.jpeg)
 Exemplo de teste na FPGA.
 
-## Análise dos Resultados
+## Conclusão
+
+O desenvolvimento do projeto de redimensionamento de imagens em FPGA permitiu aplicar conceitos de sistemas digitais e arquiteturas de computadores na prática, resultando em um coprocessador gráfico funcional capaz de executar operações de zoom in e zoom out por meio dos algoritmos de Vizinho Mais Próximo, Replicação de Pixel, Decimação e Média de Blocos. A implementação em Verilog atendeu à maior parte dos requisitos propostos, incluindo a utilização dos recursos da placa DE1-SoC e a exibição da imagem processada via saída VGA.
+
+Apesar dos avanços obtidos, algumas limitações ficaram evidentes. A integração com o processador ARM, prevista como parte da evolução do projeto, não foi concluída nesta etapa. Além disso, questões de modularização do código e de tempo de compilação indicam que o projeto poderia ser otimizado para maior clareza, reutilização e desempenho. Outro ponto foi o comportamento do reset, que não funcionou conforme o planejado, já que a imagem não retornava ao estado original após o acionamento.
+
+De forma geral, o trabalho cumpriu o papel de consolidar os conhecimentos em circuitos digitais, reforçando a importância do planejamento arquitetural e da organização do código em projetos de hardware. As dificuldades encontradas serviram como aprendizado prático para etapas futuras, em que a conexão com o processador ARM e as melhorias de desempenho poderão ser incorporadas para tornar o sistema mais robusto e escalável.

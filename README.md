@@ -106,25 +106,6 @@ Este ciclo se repete em alta velocidade até que toda a imagem redimensionada es
 
 Ao final do processo, o módulo de processamento envia o sinal done para a UC. A UC, ao detectar esse sinal, desativa a escrita (wren) e ativa a flag exibe_imagem. Essa flag libera a porta da RAM para leitura e um multiplexador de dados direciona a imagem redimensionada para o driver VGA, que a exibe no monitor.
 
-
-**A Unidade de Controle (UC)**
-
-A Unidade de Controle é o cérebro do sistema, orquestrando a sequência de operações para redimensionar a imagem. Implementada como uma Máquina de Estados Finita (FSM), ela gerencia o fluxo de dados e garante que cada módulo (Decimação, Replicação, etc.) execute sua tarefa no momento correto, evitando conflitos de acesso às memórias.
-
-O ciclo de vida da UC é dividido em três estados principais, que se repetem enquanto o sistema está em operação:
-
-- **Estado INICIO:** Este é o estado de repouso da UC. Nela, o sistema aguarda pacientemente por um comando de início. A transição para o próximo estado acontece quando o sinal start_pulse é detectado e nenhuma operação está ativa (!operacao_ativa). O start_pulse é gerado por um circuito de detecção de borda no botão de start, garantindo que o comando seja acionado apenas uma vez por pressão. Ao sair deste estado, a UC armazena a seleção do algoritmo (SW) para uso futuro.
-
-- **Estado EXECUTE:** Após o sinal de start, a UC transita para este estado. Sua função aqui é passar o controle para o módulo de processamento selecionado. Neste momento, um multiplexador direciona o start_pulse apenas para o módulo correspondente, que então inicia o ciclo de leitura, processamento e escrita. A UC permanece neste estado por apenas um ciclo de clock, agindo como um "gerente" que delega a tarefa e, em seguida, move-se para o próximo estado para aguardar o resultado.
-
-- **Estado CHECK:** Neste estado, a UC fica em um laço de espera. Ela monitora o sinal done do módulo de processamento que foi ativado. O sinal done indica que o módulo terminou de redimensionar a imagem e gravou todos os pixels na MemoriaImgRED. Assim que o done é detectado, a UC executa ações cruciais:
-
-  - Desativa a operação (operacao_ativa <= 1'b0), o que impede novas execuções até um novo comando de start.
-
-  - Ativa a flag ready, informando que o processo de redimensionamento está completo e o sistema está pronto para exibir o resultado.
-
-  - Define o próximo estado como INICIO, preparando o sistema para um novo ciclo.
-
 **Gerenciamento de Memórias e Exibição**
 
 A Unidade de Controle também é responsável por gerenciar os acessos à memória e o que é exibido na tela.
@@ -137,16 +118,9 @@ A Unidade de Controle também é responsável por gerenciar os acessos à memór
  
 A UC controla um multiplexador que seleciona qual endereço é enviado à RAM. Durante o estado de processamento, ela prioriza o endereço do módulo de processamento. Após a conclusão (done ser detectado), ela ativa a flag exibe_imagem, que muda a seleção do multiplexador para o endereço calculado pelo driver de vídeo, permitindo que a imagem redimensionada seja exibida na tela.
 
-![Exemplo de Fluxo de Dados](imagens/ExemploFluxodeDados.jpeg)
+![Exemplo da Multiplexação da Memória](imagens/ExemploFluxodeDados.jpeg)
 
 Exemplo do fluxo de dados na unidade de controle.
-
-**Modo de Repouso:** 
-
-Quando o sistema não está em uma operação de redimensionamento (!operacao_ativa) e a flag de exibição (exibe_imagem) está desativada, a UC entra em um estado de repouso. Nesse estado, ela configura o sistema para exibir a imagem original, lendo-a diretamente da MemoriaROM e enviando-a para o driver VGA. Isso cria uma experiência de usuário fluida, onde a imagem original é sempre exibida até que uma nova operação de redimensionamento seja solicitada.
-
-A combinação desses estados e o controle sobre os sinais de multiplexação garantem que cada etapa do fluxo de dados — desde a leitura da imagem original até a exibição da imagem redimensionada — ocorra sem interrupções e de maneira coordenada.
-
 
 ### Implementação dos Algoritmos:
 

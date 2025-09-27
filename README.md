@@ -19,11 +19,13 @@
 
 ## Introdução e Definição do Problema
 
-Este projeto aborda o desenvolvimento de um módulo embarcado de **Redimensionamento de Imagens** focado em sistemas de vigilância e exibição em tempo real, sob o tema "Zoom Digital: Redimensionamento de Imagens com FPGA em Verilog".
+Este projeto aborda o desenvolvimento de um módulo embarcado de Redimensionamento de Imagens focado em sistemas de vigilância e exibição em tempo real, sob o tema "Zoom Digital: Redimensionamento de Imagens com FPGA em Verilog".
 
-O objetivo principal é projetar e implementar um **co-processador gráfico** que realize as operações de ampliação (zoom-in) ou redução (downscale) de imagens diretamente em hardware. O desenvolvimento é dividido em etapas, e o foco inicial é a construção de um sistema autossuficiente executado inteiramente na FPGA da placa de desenvolvimento **DE1-SoC**.
+O objetivo principal é projetar e implementar um co-processador gráfico que realize as operações de ampliação (zoom-in) ou redução (downscale) de imagens diretamente em hardware. O desenvolvimento é dividido em etapas, e o foco inicial é a construção de um sistema autossuficiente executado inteiramente na FPGA da placa de desenvolvimento DE1-SoC.
 
-Este co-processador deve simular um comportamento básico de **interpolação visual**, permitindo o controle das operações através de chaves e botões da placa, e exibindo a imagem processada via saída **VGA**.
+Todo o projeto foi desenvolvido utilizando a linguagem Verilog para descrever o hardware e o ambiente de desenvolvimento Quartus Prime versão 23.1 para implementação na placa.
+
+Este co-processador deve simular um comportamento básico de interpolação visual, permitindo o controle das operações através de chaves e botões da placa, e exibindo a imagem processada via saída VGA.
 
 ##  Requisitos Principais
 
@@ -211,6 +213,6 @@ Apesar dos avanços obtidos, algumas limitações ficaram evidentes. A integraç
 De forma geral, o trabalho cumpriu o papel de consolidar os conhecimentos em circuitos digitais, reforçando a importância do planejamento arquitetural e da organização do código em projetos de hardware. As dificuldades encontradas serviram como aprendizado prático para etapas futuras, em que a conexão com o processador ARM e as melhorias de desempenho poderão ser incorporadas para tornar o sistema mais robusto e escalável.
 
 ## Colaboradores
-* **Alana Nogueira** -  [Alana]([https://github.com/riancmd](https://github.com/alananogueeira))
-* **Kamilly Matos** - [Kamilly]([https://github.com/VitrolaVT](https://github.com/kamillymatos))
-* **Julia Gonçalves** - [Julia]([https://github.com/Edgardem](https://github.com/julia-oliver))
+* **Alana Nogueira** - [Alana Nogueira](https://github.com/alananogueeira)
+* **Kamilly Matos** - [Kamilly Matos](https://github.com/kamillymatos)
+* **Julia Gonçalves** - [Julia Gonçalves](https://github.com/julia-oliver)

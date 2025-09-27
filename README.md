@@ -115,12 +115,12 @@ A Unidade de Controle gerencia o acesso às memórias em duas fases distintas, a
 - *Durante o Processamento:*
 Os algoritmos de redimensionamento controlam o acesso às memórias. A ROM fornece os pixels da imagem original, enquanto a RAM recebe os pixels processados. O algoritmo ativo (selecionado pelas chaves SW) determina os endereços e dados que serão escritos na memória de destino.
 
-- *Durante a Exibição:*
-O driver VGA assume o controle da RAM para leitura, calculando os endereços baseados na posição do pixel sendo renderizado. A escrita na RAM é desabilitada para preservar a integridade dos dados armazenados.
-
 ![Exemplo da Multiplexação da Memória](imagens/ExemploFluxodeDados.jpeg)
 
 Exemplo da multiplexação da memória.
+
+- *Durante a Exibição:*
+O driver VGA assume o controle da RAM para leitura, calculando os endereços baseados na posição do pixel sendo renderizado. A escrita na RAM é desabilitada para preservar a integridade dos dados armazenados.
 
 ### Controle de Transição
 

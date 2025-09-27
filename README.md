@@ -133,13 +133,13 @@ A transição entre os modos é controlada por uma máquina de estados que detec
 
 - **Decimação:** O módulo varre todos os pixels da ROM a cada ciclo. A lógica de escrita é implementada com uma condição que ativa o sinal wren somente quando as coordenadas de origem (cont_x_orig, cont_y_orig) são múltiplos exatos do fator de decimação. Assim, o primeiro pixel de cada bloco é amostrado e escrito na RAM, e todos os outros pixels do bloco são lidos e descartados.
   
-- **Média de Blocos:** O módulo utiliza uma FSM interna para controlar o fluxo de soma e escrita. Ele lê e acumula o valor de N2 pixels consecutivos em um registrador soma. Somente após a soma estar completa, o módulo calcula a média aritmética (soma / N^2) e escreve esse único valor na RAM, ativando o wren por apenas um ciclo. O avanço para o próximo bloco de pixels na ROM só ocorre após a escrita do pixel médio.
+- **Média de Blocos:** O módulo utiliza uma FSM interna para controlar o fluxo de soma e escrita. Ele lê e acumula o valor de N^2 pixels consecutivos em um registrador soma. Somente após a soma estar completa, o módulo calcula a média aritmética (soma / N^2) e escreve esse único valor na RAM, ativando o wren por apenas um ciclo. O avanço para o próximo bloco de pixels na ROM só ocorre após a escrita do pixel médio.
 
 #### Algoritmos de Ampliação (Upscale)
 
-- **Vizinho Mais Próximo:** Este módulo varre e escreve em todos os endereços da imagem de saída. O endereço de leitura (rom_addr) é calculado em tempo real a partir das coordenadas de saída (cont_x_saida, cont_y_saida) usando divisão inteira pelo fator de zoom. A divisão inteira garante que, para todos os N2 pixels dentro do bloco de saída, o endereço da ROM sempre aponte para o mesmo pixel de origem. O pixel lido (pixel_in) é continuamente replicado e escrito na RAM.
+- **Vizinho Mais Próximo:** Este módulo varre e escreve em todos os endereços da imagem de saída. O endereço de leitura (rom_addr) é calculado em tempo real a partir das coordenadas de saída (cont_x_saida, cont_y_saida) usando divisão inteira pelo fator de zoom. A divisão inteira garante que, para todos os N^2 pixels dentro do bloco de saída, o endereço da ROM sempre aponte para o mesmo pixel de origem. O pixel lido (pixel_in) é continuamente replicado e escrito na RAM.
   
-- **Replicação:** O módulo utiliza uma lógica de hold e contadores internos (block_x, block_y). Ele lê um único pixel da ROM e o armazena no registrador pixel_hold. Em seguida, o módulo passa N2 ciclos de clock repetindo a escrita desse pixel_hold na RAM, avançando apenas os contadores de endereço de destino. O endereço da ROM só é avançado para ler o próximo pixel após o bloco N×N estar totalmente preenchido.
+- **Replicação:** O módulo utiliza uma lógica de hold e contadores internos (block_x, block_y). Ele lê um único pixel da ROM e o armazena no registrador pixel_hold. Em seguida, o módulo passa N^2 ciclos de clock repetindo a escrita desse pixel_hold na RAM, avançando apenas os contadores de endereço de destino. O endereço da ROM só é avançado para ler o próximo pixel após o bloco N×N estar totalmente preenchido.
 
 ### Modo de Uso: Utilizando o Coprocessador
 
@@ -196,3 +196,19 @@ De forma geral, o trabalho cumpriu o papel de consolidar os conhecimentos em cir
 * **Alana Nogueira** - [Alana Nogueira](https://github.com/alananogueeira)
 * **Kamilly Matos** - [Kamilly Matos](https://github.com/kamillymatos)
 * **Julia Gonçalves** - [Julia Gonçalves](https://github.com/julia-oliver)
+
+## Referências
+
+### Sites
+
+ADAMS, Van Hunter. VGA Driver for DE1-SoC. Disponível em: https://vanhunteradams.com/DE1/VGA_Driver/Driver.html#Verilog-VGA-Driver
+
+INTEL. Cyclone V Device Overview. Disponível em: https://www.intel.com/content/www/us/en/docs/programmable/683694/current/cyclone-v-device-overview.html
+
+TECHNOLOGIES, T. Terasic - SoC Platform - Cyclone - DE1-SoC Board. Disponível em: https://www.terasic.com.tw/cgi-bin/page/archive.pl?Language=English&No=836.
+
+### Livros / Apostilas
+
+PATTERSON, David A.; HENNESSY, John L. Computer Organization and Design: The Hardware/Software Interface, ARM Edition. Amsterdam: Morgan Kaufmann, 2017. ISBN 978-0-12-801733-3
+
+MERRICK, Russell. Getting Started with FPGAs: Digital Circuit Design, Verilog, and VHDL for Beginners. San Francisco: No Starch Press, 2024. ISBN 978-1-7185-0294-9

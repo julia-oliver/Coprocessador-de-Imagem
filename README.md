@@ -143,6 +143,10 @@ Quando o sistema não está em uma operação de redimensionamento (!operacao_at
 
 A combinação desses estados e o controle sobre os sinais de multiplexação garantem que cada etapa do fluxo de dados — desde a leitura da imagem original até a exibição da imagem redimensionada — ocorra sem interrupções e de maneira coordenada.
 
+![Exemplo de Fluxo de Dados](imagens/exemploicarus.png)
+
+Exemplo do fluxo de dados na unidade de controle.
+
 ### Implementação dos Algoritmos:
 
 #### Algoritmos de Redução (Downscale)
@@ -207,3 +211,8 @@ O desenvolvimento do projeto de redimensionamento de imagens em FPGA permitiu ap
 Apesar dos avanços obtidos, algumas limitações ficaram evidentes. A integração com o processador ARM, prevista como parte da evolução do projeto, não foi concluída nesta etapa. Além disso, questões de modularização do código e de tempo de compilação indicam que o projeto poderia ser otimizado para maior clareza, reutilização e desempenho. Outro ponto foi o comportamento do reset, que não funcionou conforme o planejado, já que a imagem não retornava ao estado original após o acionamento.
 
 De forma geral, o trabalho cumpriu o papel de consolidar os conhecimentos em circuitos digitais, reforçando a importância do planejamento arquitetural e da organização do código em projetos de hardware. As dificuldades encontradas serviram como aprendizado prático para etapas futuras, em que a conexão com o processador ARM e as melhorias de desempenho poderão ser incorporadas para tornar o sistema mais robusto e escalável.
+
+## Colaboradores
+* **Alana Nogueira** -  [Alana]([https://github.com/riancmd](https://github.com/alananogueeira))
+* **Kamilly Matos** - [Kamilly]([https://github.com/VitrolaVT](https://github.com/kamillymatos))
+* **Julia Gonçalves** - [Julia]([https://github.com/Edgardem](https://github.com/julia-oliver))

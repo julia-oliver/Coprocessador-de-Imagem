@@ -120,7 +120,7 @@ A UC controla um multiplexador que seleciona qual endereço é enviado à RAM. D
 
 ![Exemplo da Multiplexação da Memória](imagens/ExemploFluxodeDados.jpeg)
 
-Exemplo do fluxo de dados na unidade de controle.
+Exemplo da multiplexação da memória.
 
 ### Implementação dos Algoritmos:
 

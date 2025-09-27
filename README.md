@@ -23,7 +23,7 @@ Este projeto aborda o desenvolvimento de um módulo embarcado de Redimensionamen
 
 O objetivo principal é projetar e implementar um co-processador gráfico que realize as operações de ampliação (zoom-in) ou redução (downscale) de imagens diretamente em hardware. O desenvolvimento é dividido em etapas, e o foco inicial é a construção de um sistema autossuficiente executado inteiramente na FPGA da placa de desenvolvimento DE1-SoC.
 
-Todo o projeto foi desenvolvido utilizando a linguagem Verilog para descrever o hardware e o ambiente de desenvolvimento Quartus Prime versão 23.1 para implementação na placa.
+Todo o projeto foi desenvolvido utilizando a linguagem Verilog para descrever o hardware e o software de desenvolvimento Quartus Prime versão 23.1 para implementação na placa.
 
 Este co-processador deve simular um comportamento básico de interpolação visual, permitindo o controle das operações através de chaves e botões da placa, e exibindo a imagem processada via saída VGA.
 

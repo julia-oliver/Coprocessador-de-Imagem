@@ -106,17 +106,21 @@ Este ciclo se repete em alta velocidade até que toda a imagem redimensionada es
 
 Ao final do processo, o módulo de processamento envia o sinal done para a UC. A UC, ao detectar esse sinal, desativa a escrita (wren) e ativa a flag exibe_imagem. Essa flag libera a porta da RAM para leitura e um multiplexador de dados direciona a imagem redimensionada para o driver VGA, que a exibe no monitor.
 
-**Gerenciamento de Memórias e Exibição**
+### **Gerenciamento de Memórias e Exibição**
 
-A Unidade de Controle também é responsável por gerenciar os acessos à memória e o que é exibido na tela.
+A Unidade de Controle gerencia o acesso às memórias em duas fases distintas, alternando entre processamento e exibição para evitar conflitos de acesso.
 
-*Multiplexação de Endereços:* O sistema tem duas fontes de endereços para a memória RAM (MemoriaImgRED):
+ **Operação do Sistema**
 
-- O módulo de processamento, que calcula o endereço de destino para a escrita (ram_addr_writer).
+- *Durante o Processamento:*
+Os algoritmos de redimensionamento controlam o acesso às memórias. A ROM fornece os pixels da imagem original, enquanto a RAM recebe os pixels processados. O algoritmo ativo (selecionado pelas chaves SW) determina os endereços e dados que serão escritos na memória de destino.
 
-- O driver de vídeo VGA, que calcula o endereço para a leitura e exibição (ram_addr_calc).
- 
-A UC controla um multiplexador que seleciona qual endereço é enviado à RAM. Durante o estado de processamento, ela prioriza o endereço do módulo de processamento. Após a conclusão (done ser detectado), ela ativa a flag exibe_imagem, que muda a seleção do multiplexador para o endereço calculado pelo driver de vídeo, permitindo que a imagem redimensionada seja exibida na tela.
+- *Durante a Exibição:*
+O driver VGA assume o controle da RAM para leitura, calculando os endereços baseados na posição do pixel sendo renderizado. A escrita na RAM é desabilitada para preservar a integridade dos dados armazenados.
+
+### Controle de Transição
+
+A transição entre os modos é controlada por uma máquina de estados que detecta quando o processamento é concluído e automaticamente habilita o modo de exibição. Isso garante que a imagem só seja mostrada após estar completamente processada, evitando artefatos visuais durante a operação.
 
 ![Exemplo da Multiplexação da Memória](imagens/ExemploFluxodeDados.jpeg)
 

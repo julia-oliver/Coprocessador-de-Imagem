@@ -1,0 +1,141 @@
+Flow report for AlgoritmosRedimensionamento
+Fri Sep 26 18:30:22 2025
+Quartus Prime Version 23.1std.0 Build 991 11/28/2023 SC Lite Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Flow Summary
+  3. Flow Settings
+  4. Flow Non-Default Global Settings
+  5. Flow Elapsed Time
+  6. Flow OS Summary
+  7. Flow Log
+  8. Flow Messages
+  9. Flow Suppressed Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 2023  Intel Corporation. All rights reserved.
+Your use of Intel Corporation's design tools, logic functions 
+and other software and tools, and any partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel FPGA IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Intel and sold by Intel or its authorized distributors.  Please
+refer to the applicable agreement for further details, at
+https://fpgasoftware.intel.com/eula.
+
+
+
++----------------------------------------------------------------------------------+
+; Flow Summary                                                                     ;
++---------------------------------+------------------------------------------------+
+; Flow Status                     ; Successful - Fri Sep 26 18:29:51 2025          ;
+; Quartus Prime Version           ; 23.1std.0 Build 991 11/28/2023 SC Lite Edition ;
+; Revision Name                   ; AlgoritmosRedimensionamento                    ;
+; Top-level Entity Name           ; UnidadeControle                                ;
+; Family                          ; Cyclone V                                      ;
+; Device                          ; 5CSEMA5F31C6                                   ;
+; Timing Models                   ; Final                                          ;
+; Logic utilization (in ALMs)     ; 1,138 / 32,070 ( 4 % )                         ;
+; Total registers                 ; 441                                            ;
+; Total pins                      ; 39 / 457 ( 9 % )                               ;
+; Total virtual pins              ; 0                                              ;
+; Total block memory bits         ; 2,611,200 / 4,065,280 ( 64 % )                 ;
+; Total DSP Blocks                ; 10 / 87 ( 11 % )                               ;
+; Total HSSI RX PCSs              ; 0                                              ;
+; Total HSSI PMA RX Deserializers ; 0                                              ;
+; Total HSSI TX PCSs              ; 0                                              ;
+; Total HSSI PMA TX Serializers   ; 0                                              ;
+; Total PLLs                      ; 1 / 6 ( 17 % )                                 ;
+; Total DLLs                      ; 0 / 4 ( 0 % )                                  ;
++---------------------------------+------------------------------------------------+
+
+
++-------------------------------------------------+
+; Flow Settings                                   ;
++-------------------+-----------------------------+
+; Option            ; Setting                     ;
++-------------------+-----------------------------+
+; Start date & time ; 09/26/2025 18:18:59         ;
+; Main task         ; Compilation                 ;
+; Revision Name     ; AlgoritmosRedimensionamento ;
++-------------------+-----------------------------+
+
+
++-------------------------------------------------------------------------------------------------------------------------------------------+
+; Flow Non-Default Global Settings                                                                                                          ;
++-------------------------------------+----------------------------------------+-----------------------------+-----------------+------------+
+; Assignment Name                     ; Value                                  ; Default Value               ; Entity Name     ; Section Id ;
++-------------------------------------+----------------------------------------+-----------------------------+-----------------+------------+
+; COMPILER_SIGNATURE_ID               ; 1095756782746.175892153812964          ; --                          ; --              ; --         ;
+; MAX_CORE_JUNCTION_TEMP              ; 85                                     ; --                          ; --              ; --         ;
+; MIN_CORE_JUNCTION_TEMP              ; 0                                      ; --                          ; --              ; --         ;
+; MISC_FILE                           ; MemoriaROM.bsf                         ; --                          ; --              ; --         ;
+; MISC_FILE                           ; MemoriaROM_inst.v                      ; --                          ; --              ; --         ;
+; MISC_FILE                           ; MemoriaROM_bb.v                        ; --                          ; --              ; --         ;
+; MISC_FILE                           ; MemoriaROM.inc                         ; --                          ; --              ; --         ;
+; MISC_FILE                           ; MemoriaROM.cmp                         ; --                          ; --              ; --         ;
+; MISC_FILE                           ; MemoriaImgRED.bsf                      ; --                          ; --              ; --         ;
+; MISC_FILE                           ; MemoriaImgRED_inst.v                   ; --                          ; --              ; --         ;
+; MISC_FILE                           ; MemoriaImgRED_bb.v                     ; --                          ; --              ; --         ;
+; MISC_FILE                           ; MemoriaImgRED.inc                      ; --                          ; --              ; --         ;
+; MISC_FILE                           ; MemoriaImgRED.cmp                      ; --                          ; --              ; --         ;
+; MISC_FILE                           ; clock_100.cmp                          ; --                          ; --              ; --         ;
+; MISC_FILE                           ; clock_100_sim/clock_100.vo             ; --                          ; --              ; --         ;
+; PARTITION_COLOR                     ; -- (Not supported for targeted family) ; --                          ; UnidadeControle ; Top        ;
+; PARTITION_FITTER_PRESERVATION_LEVEL ; -- (Not supported for targeted family) ; --                          ; UnidadeControle ; Top        ;
+; PARTITION_NETLIST_TYPE              ; -- (Not supported for targeted family) ; --                          ; UnidadeControle ; Top        ;
+; PROJECT_OUTPUT_DIRECTORY            ; output_files                           ; --                          ; --              ; --         ;
+; SPD_FILE                            ; clock_100.spd                          ; --                          ; --              ; --         ;
+; SYNTHESIS_ONLY_QIP                  ; On                                     ; --                          ; --              ; --         ;
+; TOP_LEVEL_ENTITY                    ; UnidadeControle                        ; AlgoritmosRedimensionamento ; --              ; --         ;
++-------------------------------------+----------------------------------------+-----------------------------+-----------------+------------+
+
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Flow Elapsed Time                                                                                                        ;
++----------------------+--------------+-------------------------+---------------------+------------------------------------+
+; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
++----------------------+--------------+-------------------------+---------------------+------------------------------------+
+; Analysis & Synthesis ; 00:00:32     ; 1.0                     ; 4848 MB             ; 00:00:53                           ;
+; Fitter               ; 00:09:59     ; 1.0                     ; 6252 MB             ; 00:14:28                           ;
+; Assembler            ; 00:00:16     ; 1.0                     ; 4891 MB             ; 00:00:14                           ;
+; Timing Analyzer      ; 00:00:30     ; 1.5                     ; 5262 MB             ; 00:00:42                           ;
+; Total                ; 00:11:17     ; --                      ; --                  ; 00:16:17                           ;
++----------------------+--------------+-------------------------+---------------------+------------------------------------+
+
+
++------------------------------------------------------------------------------------+
+; Flow OS Summary                                                                    ;
++----------------------+------------------+------------+------------+----------------+
+; Module Name          ; Machine Hostname ; OS Name    ; OS Version ; Processor type ;
++----------------------+------------------+------------+------------+----------------+
+; Analysis & Synthesis ; DESKTOP-9F9FM0L  ; Windows 10 ; 10.0       ; x86_64         ;
+; Fitter               ; DESKTOP-9F9FM0L  ; Windows 10 ; 10.0       ; x86_64         ;
+; Assembler            ; DESKTOP-9F9FM0L  ; Windows 10 ; 10.0       ; x86_64         ;
+; Timing Analyzer      ; DESKTOP-9F9FM0L  ; Windows 10 ; 10.0       ; x86_64         ;
++----------------------+------------------+------------+------------+----------------+
+
+
+------------
+; Flow Log ;
+------------
+quartus_map --read_settings_files=on --write_settings_files=off AlgoritmosRedimensionamento -c AlgoritmosRedimensionamento
+quartus_fit --read_settings_files=off --write_settings_files=off AlgoritmosRedimensionamento -c AlgoritmosRedimensionamento
+quartus_asm --read_settings_files=off --write_settings_files=off AlgoritmosRedimensionamento -c AlgoritmosRedimensionamento
+quartus_sta AlgoritmosRedimensionamento -c AlgoritmosRedimensionamento
+
+
+

@@ -1,0 +1,76 @@
+
+State Machine - |UnidadeControle|prox_estado
+Name prox_estado.INICIO prox_estado.CHECK prox_estado.EXECUTE 
+prox_estado.INICIO 0 0 0 
+prox_estado.EXECUTE 1 0 1 
+prox_estado.CHECK 1 1 0 
+
+State Machine - |UnidadeControle|estado
+Name estado.INICIO estado.CHECK estado.EXECUTE 
+estado.INICIO 0 0 0 
+estado.EXECUTE 1 0 1 
+estado.CHECK 1 1 0 
+
+State Machine - |UnidadeControle|vga_driver:draw|v_state
+Name v_state.V_BACK_STATE v_state.V_PULSE_STATE v_state.V_FRONT_STATE v_state.V_ACTIVE_STATE 
+v_state.V_ACTIVE_STATE 0 0 0 0 
+v_state.V_FRONT_STATE 0 0 1 1 
+v_state.V_PULSE_STATE 0 1 0 1 
+v_state.V_BACK_STATE 1 0 0 1 
+
+State Machine - |UnidadeControle|vga_driver:draw|h_state
+Name h_state.H_BACK_STATE h_state.H_PULSE_STATE h_state.H_FRONT_STATE h_state.H_ACTIVE_STATE 
+h_state.H_ACTIVE_STATE 0 0 0 0 
+h_state.H_FRONT_STATE 0 0 1 1 
+h_state.H_PULSE_STATE 0 1 0 1 
+h_state.H_BACK_STATE 1 0 0 1 
+
+State Machine - |UnidadeControle|MediaDeBlocos:comb_30|prox_estado
+Name prox_estado.FINAL prox_estado.WRITE prox_estado.PROCESS prox_estado.IDLE 
+prox_estado.IDLE 0 0 0 0 
+prox_estado.PROCESS 0 0 1 1 
+prox_estado.WRITE 0 1 0 1 
+prox_estado.FINAL 1 0 0 1 
+
+State Machine - |UnidadeControle|MediaDeBlocos:comb_30|estado
+Name estado.FINAL estado.WRITE estado.PROCESS estado.IDLE 
+estado.IDLE 0 0 0 0 
+estado.PROCESS 0 0 1 1 
+estado.WRITE 0 1 0 1 
+estado.FINAL 1 0 0 1 
+
+State Machine - |UnidadeControle|Decimacao:dcm_inst|prox_estado
+Name prox_estado.INICIO prox_estado.FINAL prox_estado.PROCESSAMENTO 
+prox_estado.INICIO 0 0 0 
+prox_estado.PROCESSAMENTO 1 0 1 
+prox_estado.FINAL 1 1 0 
+
+State Machine - |UnidadeControle|Decimacao:dcm_inst|estado
+Name estado.INICIO estado.FINAL estado.PROCESSAMENTO 
+estado.INICIO 0 0 0 
+estado.PROCESSAMENTO 1 0 1 
+estado.FINAL 1 1 0 
+
+State Machine - |UnidadeControle|Replicacao:vmp_inst|prox_estado
+Name prox_estado.IDLE prox_estado.FINAL prox_estado.PROCESS 
+prox_estado.IDLE 0 0 0 
+prox_estado.PROCESS 1 0 1 
+prox_estado.FINAL 1 1 0 
+
+State Machine - |UnidadeControle|Replicacao:vmp_inst|estado
+Name estado.IDLE estado.FINAL estado.PROCESS 
+estado.IDLE 0 0 0 
+estado.PROCESS 1 0 1 
+estado.FINAL 1 1 0 
+
+State Machine - |UnidadeControle|VizinhoMaisProximo:comb_17|prox_estado
+Name prox_estado.IDLE prox_estado.FINAL prox_estado.PROCESS 
+prox_estado.IDLE 0 0 0 
+prox_estado.PROCESS 1 0 1 
+prox_estado.FINAL 1 1 0 
+
+State Machine - |UnidadeControle|VizinhoMaisProximo:comb_17|estado
+Name estado.IDLE estado.FINAL estado.PROCESS 
+estado.IDLE 0 0 0 
+estado.PROCESS 1 0 1 
+estado.FINAL 1 1 0 

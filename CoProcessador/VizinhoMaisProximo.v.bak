@@ -1,0 +1,114 @@
+module VizinhoMaisProximo (
+    // Entradas
+    input wire clk,
+    input wire rst,
+    input wire start,
+    input wire confirmacao_leitura, 
+    input wire [15:0] ram_data_out,
+
+    // Saídas
+    output reg done,                       
+    output reg [15:0] data_out,
+    output wire [15:0] address_to_ram,     
+    output wire [16:0] output_address      
+);
+
+    // Parâmetros de estado
+    localparam [1:0] INICIO     = 2'b00;
+    localparam [1:0] LEITURA    = 2'b01;
+    localparam [1:0] DUPLICACAO = 2'b10;
+
+    // Registradores de controle
+    reg [1:0] estado_atual, prox_estado;
+    reg [1:0] cont; // conta 0..3
+    reg [7:0] contador_linhas, contador_colunas;
+
+    // Registradores de dados
+    reg [15:0] pixel_reg;
+
+    // Constantes
+    localparam LARGURA_IMAGEM = 160;
+    localparam ALTURA_IMAGEM  = 120;
+    localparam LARGURA_SAIDA  = 320;
+    localparam ALTURA_SAIDA   = 240;
+
+    // Endereço de leitura da RAM (imagem original)
+    assign address_to_ram = contador_linhas * LARGURA_IMAGEM + contador_colunas;
+
+    // --- Bloco 1: Máquina de Estados Síncrona ---
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            estado_atual     <= INICIO;
+            cont             <= 2'd0;
+            contador_linhas  <= 8'd0;
+            contador_colunas <= 8'd0;
+            data_out         <= 16'h0000;
+            done             <= 1'b0;
+            pixel_reg        <= 16'h0000;
+        end else begin
+            estado_atual <= prox_estado;
+
+            case (estado_atual)
+                INICIO: begin
+                    done <= 1'b0;
+                end
+
+                LEITURA: begin
+                    if (confirmacao_leitura) begin
+                        pixel_reg <= ram_data_out;
+                        cont <= 2'd0;
+                    end
+                end
+
+                DUPLICACAO: begin
+                    data_out <= pixel_reg;
+                    done <= (cont == 2'd3); // pulso quando terminar os 4
+
+                    if (cont < 2'd3) begin
+                        cont <= cont + 1'b1;
+                    end else begin
+                        cont <= 2'd0;
+                        // Avança pixel original
+                        if (contador_colunas == (LARGURA_IMAGEM - 1)) begin
+                            contador_colunas <= 8'd0;
+                            contador_linhas  <= contador_linhas + 1;
+                        end else begin
+                            contador_colunas <= contador_colunas + 1;
+                        end
+                    end
+                end
+            endcase
+        end
+    end
+
+    // --- Bloco 2: Lógica Combinacional (FSM) ---
+    always @(*) begin
+        prox_estado = estado_atual;
+
+        case (estado_atual)
+            INICIO: begin
+                if (start) prox_estado = LEITURA;
+            end
+
+            LEITURA: begin
+                if (confirmacao_leitura) prox_estado = DUPLICACAO;
+            end
+
+            DUPLICACAO: begin
+                if ((contador_colunas == (LARGURA_IMAGEM-1)) &&
+                    (contador_linhas == (ALTURA_IMAGEM-1)) &&
+                    (cont == 2'd3))
+                    prox_estado = INICIO;
+                else if (cont == 2'd3)
+                    prox_estado = LEITURA;
+            end
+        endcase
+    end
+
+    // --- Assign: Cálculo do endereço de saída (wire, sem conflito) ---
+    assign output_address = (cont == 2'd0) ? ( (2*contador_linhas    * LARGURA_SAIDA) + (2*contador_colunas) ) :
+                            (cont == 2'd1) ? ( (2*contador_linhas    * LARGURA_SAIDA) + (2*contador_colunas + 1) ) :
+                            (cont == 2'd2) ? ( ((2*contador_linhas+1)* LARGURA_SAIDA) + (2*contador_colunas) ) :
+                                              ( ((2*contador_linhas+1)* LARGURA_SAIDA) + (2*contador_colunas + 1) );
+
+endmodule

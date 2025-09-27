@@ -1,0 +1,311 @@
+module (
+			input  wire        clk_50,          
+			input  wire        reset,
+			input  wire        start, 		      //Botão para confirmar a seleção ds chaves para um determinado algoritmo
+			input  wire [1:0]  SW,					//Tipo de algoritmo usado para redimensionamento
+			input  wire [1:0]  ft,             	// fator de redimensionamento: 0->1x, 1->2x, 2->4x
+			output wire [1:0]  opcao_Redmn,
+			output wire [2:0]  estadoAtual,
+			output wire [9:0] Largura_nova, 		// cabe até 1023
+			output wire [9:0] Altura_nova,
+			output reg         ready
+
+	);
+		// -------------------------------------------------------------------------
+		// Divisor de clock 50mhz -> 25mhz 
+		// -------------------------------------------------------------------------
+			wire clock_25;
+				divisor_clock(
+			  .clk_50(clk_50),
+			  .reset(!reset),
+			  .clk_25(clock_25)
+			);
+		
+	 // -------------------------------------------------
+    // Pulso de start (botão ativo-low: detecta 1->0)
+    // -------------------------------------------------
+		 reg start_d;
+		 wire start_pulse;
+		 always @(posedge clock_25 or negedge reset) begin
+			  if (!reset)
+					start_d <= 1'b1; // botão não pressionado = 1
+			  else
+					start_d <= start;
+		 end
+		 // pulso de 1 ciclo quando botão for pressionado (1 -> 0)
+		 assign start_pulse = start_d & ~start;
+		
+		// -------------------------------------------------------------------------
+		// Parâmetros da imagem base
+		// -------------------------------------------------------------------------
+		localparam integer ALTURA_ORIGINAL  = 120;
+		localparam integer LARGURA_ORIGINAL = 160;
+		
+	
+		// -------------------------------------------------------------------------
+		// Estados
+		// -------------------------------------------------------------------------
+		localparam INICIO           = 3'b000;
+		localparam FETCH_PIXEL_DATA = 3'b001;
+		localparam EXECUTE          = 3'b010;
+		localparam WRITEBACK        = 3'b011;
+		localparam CHECK_LOOP       = 3'b100;
+
+		// Tipos de algoritmos
+		localparam VIZINHO_PROXIMO = 2'b00;
+		localparam DECIMACAO       = 2'b01;
+		localparam REPLICACAO      = 2'b10;
+		localparam MEDIA_BLOCOS    = 2'b11;
+		
+		
+		reg  [2:0] estado;
+		assign estadoAtual = estado;
+
+		reg  [1:0] Tipo_redmn;
+		assign opcao_Redmn = Tipo_redmn;
+		wire done;
+		
+		// -------------------------------------------------------------------------
+		// Memórias
+		// -------------------------------------------------------------------------
+			
+			reg [7:0] saida_ROM;   
+			reg [7:0] saida_RAM;
+			
+			reg  [MAX_ADDR_BITS-1:0] rom_addr;
+			reg  [MAX_ADDR_BITS-1:0] ram_addr;
+			reg                      HabilitaEscritaRED;  
+			reg [7:0]                RAM_in;
+
+
+			// BRAM da imagem original (somente leitura)
+			MemoriaROM (
+				.address (rom_addr),
+				.clock   (clock_25),
+				.q       (saida_ROM)
+			);
+
+			// BRAM da imagem redimensionada (escrita)
+			MemoriaImgRED (
+				.address (EnderecoRAM),
+				.clock   (clock_25),
+				.data    (RAM_in),
+				.wren    (wren_ram),
+				.q       (saida_RAM)
+			);
+			
+			
+			
+		// -------------------------------------------------------------------------
+		// Instâncias dos módulos dos Algoritmos de redimensionamento
+		// -------------------------------------------------------------------------
+		
+			//Vizinho mais proximo
+			
+			wire done_vmp;
+			wire [7:0] pixel_out_vmp;
+			wire wren_vmp;
+			wire [19:0] ram_addr_vmp;
+					
+		  
+		  VizinhoMaisProximo vmp_inst (
+			  .clk(clock_25),
+			  .rst(!reset),
+			  .start(start_pulse),     
+			  .zoom_select(zoom_select),
+			  .pixel_in(saida_ROM),
+			  .done(done_vmp),
+			  .pixel_out(pixel_out_vmp),
+			  .wren(wren_vmp),
+			  .rom_addr(rom_addr_vpm),
+			  .ram_addr(ram_addr_vmp),
+			  .led_test(led_teste)
+		 );
+		 
+			 
+			//Decimaçao
+			 
+			 wire done_dcm;
+			 wire [7:0] pixel_out_dcm;
+			 wire wren_dcm;
+			 wire [19:0] ram_addr_dcm;
+
+		 Decimacao dcm_inst (
+				 .clk(clock_25),
+				 .reset(!reset),
+				 .start(start_pulse),
+				 .zoom_select(zoom_select),
+				 .pixel_in(rom_pixel),          
+				 .pixel_out(pixel_out_dcm),
+				 .rom_addr(rom_addr_dcm),     
+				 .wren_ram(wren_dcm),
+				 .ram_addr(ram_addr_dcm),     
+				 .done(done_dcm)
+		 );
+			 
+			 
+			 
+	// -------------------------------------------------------------------------
+	// FSM
+	// -------------------------------------------------------------------------
+	
+	always @(posedge clock or posedge reset) begin
+		if (reset) begin
+			estado               <= INICIO;
+			Tipo_redmn           <= 2'b00;
+			result_redimensionamento <= 8'd0;
+			HabilitaEscrita      <= 1'b0;
+			HabilitaEscritaRED   <= 1'b0;
+			operacao_ativa       <= 1'b0;
+			ready                <= 1'b0;
+			armazena_pixelTEMP   <= 8'd0;
+		end else begin
+			case (estado)
+				INICIO: begin
+					HabilitaEscrita    <= 1'b0;
+					HabilitaEscritaRED <= 1'b0;
+					ready              <= 1'b0;
+					if (start_pulse && !operacao_ativa) begin
+						operacao_ativa <= 1'b1;
+						Tipo_redmn      <= SW;
+						estado          <= EXECUTE;
+					end else begin
+						estado <= INICIO;
+					end
+				end
+
+				EXECUTE: begin
+					case (Tipo_redmn)
+						VIZINHO_PROXIMO: begin
+							rom_addr <= rom_addr_vmp;
+							HabilitaEscritaRED <= wren_vpm;
+							ram_addr <= ram_addr_vpm;
+							ram_in <= pixel_out_vmp;
+							assign done = done_vmp;
+							
+							
+						end
+						DECIMACAO: begin
+							// TODA a lógica da decimação
+							
+						end
+						REPLICACAO: begin
+							// TODA a lógica da replicação
+							
+						end
+						MEDIA_BLOCOS: begin
+							// TODA a lógica da média de blocos
+							
+						end
+					endcase
+					estado <= CHECK_LOOP;
+				end
+
+				CHECK_LOOP: begin
+					HabilitaEscritaRED <= 1'b0;
+					if (done) begin
+						operacao_ativa <= 1'b0;
+						ready          <= 1'b1;
+						estado         <= INICIO;
+					end else begin
+						estado <= FETCH_PIXEL_DATA;
+					end
+				end
+			endcase
+		end
+	end
+	
+	//Centralizaçao da imagem de acordo com o tipo de algoritmo de redimensionamento
+    reg [9:0] IMG_W;
+    reg [9:0] IMG_H;
+
+    reg[9:0] x_offset;
+    reg [9:0] y_offset;
+
+   
+    wire [18:0] ram_addr_calc; // 19 bits
+    assign ram_addr_calc = (next_y - y_offset) * IMG_W + (next_x - x_offset);
+	
+	 wire [2:0] BLOCK_SIZE_val;
+    assign BLOCK_SIZE_val = (zoom_select == 2'b01) ? 2 :
+                            (zoom_select == 2'b10) ? 4 : 1;
+
+	
+	always @(posedge clock_25 or negedge reset) begin
+			if(!reset) begin
+				IMG_W <= 0;
+				IMG_H <= 0;
+				x_offset <= 0;
+				y_offset <= 0;
+				end else begin
+					case(Tipo_redmn) begin
+						VIZINHO_PROXIMO : begin
+							 IMG_W <= 160 * BLOCK_SIZE_val;
+							 IMG_H <= 120 * BLOCK_SIZE_val;
+							 
+							 x_offset <= (640 - IMG_W) / 2;
+                      y_offset <= (480 - IMG_H) / 2;
+							 
+							 end
+						DECIMACAO: begin
+							
+							 MG_W <= 160 / BLOCK_SIZE_val;
+							 IMG_H <= 120 / BLOCK_SIZE_val;
+							 
+							 x_offset <= (640 - IMG_W) / 2;
+                      y_offset <= (480 - IMG_H) / 2;
+							 
+							end
+					endcase 
+				end 
+			end
+			
+		wire [9:0] next_x;
+		wire [9:0] next_y;
+
+		wire in_image_bounds = (next_x >= x_offset) && (next_x < (x_offset + IMG_W)) &&
+                           (next_y >= y_offset) && (next_y < (y_offset + IMG_H));	
+		
+		//Endereço da RAM que o VGA le, baseado nos contadores do proprio VGA
+		
+		wire [18:0] ram_addr_calc; // 19 bits
+      assign ram_addr_calc = (next_y - y_offset) * IMG_W + (next_x - x_offset);
+
+		reg exibe_imagem = 1'b0;
+      always @(posedge clock_25 or negedge reset) begin
+        if (!reset)
+            exibe_imagem <= 1'b0;
+        else if (start_pulse)
+            exibe_imagem <= 1'b0;   // limpa quando inicia novo processamento
+        else if (done)
+            exibe_imagem <= 1'b1;   // habilita exibição quando VMP termina
+    end
+
+     wire [19:0] EnderecoRAM = (exibe_imagem) ? ram_addr_calc : ram_addr;
+     wire wren_ram = (exibe_imagem) ? 1'b0 : HabilitaEscritaRED;
+	
+	 // -------------------------------------------------
+    // Saída VGA
+    // -------------------------------------------------
+    wire [7:0] out_vga;
+    assign out_vga = (exibe_imagem && in_image_bounds) ? saida_RAM : 8'h00;
+
+    vga_driver draw(
+        .clock(~clock_25),
+        .reset(!reset),
+        .color_in(out_vga),
+        .next_x(next_x),
+        .next_y(next_y),
+        .hsync(hsync),
+        .vsync(vsync),
+        .red(vga_r),
+        .green(vga_g),
+        .blue(vga_b),
+        .sync(sync),
+        .clk(clk),
+        .blank(blank)
+    );
+						
+endmodule 
+		
+		
